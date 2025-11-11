@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SU Vote | Dashboard</title>
+    <link rel="stylesheet" href="/CSS/su.css">
+    <style>
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg, #fff);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .user-details h2 { margin: 0; color: var(--text-color, #333); }
+        .user-details p { margin: 0.25rem 0; color: var(--text-light, #666); }
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        .btn-logout:hover { background: #c82333; }
+        .login-prompt {
+            text-align: center;
+            padding: 3rem;
+            background: var(--card-bg, #fff);
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo"><h1>SU Vote</h1></div>
+            <nav class="main-navigation">
+                <ul>
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/home/login">User</a></li> 
+                    <li><a href="/home/dashboard">Polls</a></li>
+                    <li><a href="/home/settings">Settings</a></li> 
+                    <li><a href="/home/contact-us">Contact Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <div id="userInfoSection"></div>
+            </div>
+        </section>
+
+        <section class="service-highlights" id="votingSection" style="display: none;">
+            <div class="container">
+                <h2>Active Polls</h2>
+                <div class="service-cards">
+                    <article class="service-card">
+                        <div class="service-icon"><div class="icon-placeholder">🗳️</div></div>
+                        <h3>Student Council President</h3>
+                        <p>Vote for the next SU President who will represent your voice on campus.</p>
+                        <div class="event-actions">
+                            <a href="/home/vote" class="btn btn-primary">Vote Now</a>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon"><div class="icon-placeholder">🎉</div></div>
+                        <h3>Event of the Month</h3>
+                        <p>Choose which student event should receive full sponsorship this month.</p>
+                        <div class="event-actions">
+                            <a href="/home/vote" class="btn btn-primary">Vote Now</a>
+                        </div>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon"><div class="icon-placeholder">🏆</div></div>
+                        <h3>Lecturer of the Year</h3>
+                        <p>Vote for the lecturer who inspired you the most this academic year.</p>
+                        <div class="event-actions">
+                            <a href="/home/vote" class="btn btn-primary">Vote Now</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="intro" id="profileSection" style="display: none;">
+            <div class="container">
+                <h2>Your Profile</h2>
+                <div id="profileInfo"></div>
+                <a href="/home/settings" class="btn btn-secondary">Edit Profile</a>
+            </div>
+        </section>
+
+        <section class="login-prompt" id="loginPrompt">
+            <div class="container">
+                <h2>Please Login to Access Your Dashboard</h2>
+                <p>You need to be logged in to view polls and access your profile information.</p>
+                <a href="/home/login" class="btn btn-primary">Login Now</a>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2>Have Questions?</h2>
+                <p>We're here to help with any voting or account inquiries.</p>
+                <a href="/home/contact-us" class="btn btn-primary">Contact Support</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo"><h2>SU Vote</h2></div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                       <li><a href="/home">Home</a></li>
+        <li><a href="/home/login">User</a></li> 
+        <li><a href="/home/dashboard">Polls</a></li>
+        <li><a href="/home/settings">Settings</a></li> 
+        <li><a href="/home/contact-us">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p>Hammanshand Rd, Stellenbosch Central, Stellenbosch, 7599</p>
+                    <p>Phone: 0218084367</p>
+                    <p>Email: ruanr@sun.ac.za</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 SU. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const studentData = localStorage.getItem('student');
+            
+            const loginPrompt = document.getElementById('loginPrompt');
+            const votingSection = document.getElementById('votingSection');
+            const profileSection = document.getElementById('profileSection');
+            const userInfoSection = document.getElementById('userInfoSection');
+            const profileInfo = document.getElementById('profileInfo');
+            
+            if (isLoggedIn === 'true' && studentData) {
+                const student = JSON.parse(studentData);
+                
+                userInfoSection.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-details">
+                            <h2>Welcome back, ${student.firstName || student.fullName}!</h2>
+                            <p>Student Number: ${student.studentNo} | Role: Student</p>
+                            <p>Your personal voting dashboard — view available polls and your profile below.</p>
+                        </div>
+                        <button class="btn-logout" onclick="logout()">Logout</button>
+                    </div>
+                `;
+                
+                profileInfo.innerHTML = `
+                    <p><strong>Name:</strong> ${student.fullName || student.firstName}</p>
+                    <p><strong>Student Number:</strong> ${student.studentNo}</p>
+                    <p><strong>Status:</strong> Active Student</p>
+                `;
+                
+                votingSection.style.display = 'block';
+                profileSection.style.display = 'block';
+                loginPrompt.style.display = 'none';
+            } else {
+                userInfoSection.innerHTML = '<h2>Student Dashboard</h2>';
+                loginPrompt.style.display = 'block';
+                votingSection.style.display = 'none';
+                profileSection.style.display = 'none';
+            }
+        });
+        
+        function logout() {
+            localStorage.removeItem('student');
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = '/home/login';
+        }
+    </script>
+</body>
+</html>

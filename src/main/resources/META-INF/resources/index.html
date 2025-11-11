@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SU Vote">
+    <title>SU Vote | Home</title>
+    <link rel="stylesheet" href="/CSS/su.css">
+</head>
+<body>
+  
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>Vote For You, You, and You</h2>
+                    <p>Let's Vote.</p>
+                    <a href="/home/login" class="btn btn-primary">Vote Now</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Introduction Section -->
+        <section class="intro">
+            <div class="container">
+                <h2>Welcome to SU Vote!</h2>
+              <p>SU Vote is a simple, secure, and reliable online voting platform that empowers users to cast their votes anytime, anywhere. Designed for transparency and ease of use, it brings the power of fair elections to your fingertips.</p> 
+              <p>With its clean interface and real-time result tracking, SU Vote makes participation effortless — ensuring every voice is heard and every vote counts.</p>
+            </div>
+        </section>
+
+        <!-- Service Highlights -->
+        <section class="service-highlights">
+            <div class="container">
+                <h2>Lets Vote Now</h2>
+                <div class="service-cards">
+                    <article class="service-card">
+                        <div class="service-icon">
+                            <div class="icon-placeholder">🗳️</div>
+                        </div>
+                        <h3>Student Council President</h3>
+                        <p>Vote for the next SU President who will represent your voice on campus.</p>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon">
+                            <div class="icon-placeholder">🎉</div>
+                        </div>
+                        <h3>Event of the Month</h3>
+                        <p>Choose which student event should receive full sponsorship this month.</p>
+                    </article>
+
+                    <article class="service-card">
+                        <div class="service-icon">
+                            <div class="icon-placeholder">🏆</div>
+                        </div>
+                        <h3>Lecturer of the Year</h3>
+                        <p>Vote for the lecturer who inspired you the most this academic year.</p>
+                    </article>
+                </div>
+                <div class="view-all">
+                    <a href="SUvote.html" class="btn btn-secondary">View All Events</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Any Enquiries?</h2>
+                <p>Feel free to contact us. We are available 24/7</p>
+                <a href="SUabout.html" class="btn btn-primary">Contact Us Us</a>
+            </div>
+        </section>
+    </main>
+
+ <!-- Dark Mode Toggle Script -->
+<script>
+(function() {
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'darkModeToggle';
+  toggleBtn.title = 'Toggle dark mode';
+  toggleBtn.textContent = '🌙';
+  document.body.appendChild(toggleBtn);
+
+  // Load user preference
+  const isDark = localStorage.getItem('su_dark_mode') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-mode');
+    toggleBtn.textContent = '☀️';
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const darkActive = document.body.classList.contains('dark-mode');
+    localStorage.setItem('su_dark_mode', darkActive);
+    toggleBtn.textContent = darkActive ? '☀️' : '🌙';
+  });
+})();
+</script>
+
+<!-- Language Toggle Script -->
+<script>
+(function() {
+  const langBtn = document.createElement('button');
+  langBtn.id = 'langToggle';
+  langBtn.title = 'Change language';
+  langBtn.textContent = 'EN';
+  document.body.appendChild(langBtn);
+
+  const translations = {
+    'af': {
+      'Vote For You, You, and You': 'Stem vir jouself, jouself, en jouself',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Kies jou gunsteling gebeurtenis — elke stem help om die wenner te bepaal.',
+      'Cast your vote': 'Stem nou',
+      'Student Council President': 'Studenteraadspresident',
+      'Event of the Month': 'Geleentheid van die maand',
+      'Lecturer of the Year': 'Dosent van die jaar',
+      'Welcome to the chat! (simulated)': 'Welkom by die klets! (gesimuleer)',
+      'I just voted — go team!': 'Ek het pas gestem — gaan span!'
+    },
+    'xh': {
+      'Vote For You, You, and You': 'Votela Wena, Wena, noWena',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Khetha umsitho owuthandayo — ivoti ngalinye linceda ekugqibeleni ophumeleleyo.',
+      'Cast your vote': 'Votela ngoku',
+      'Student Council President': 'UMongameli weBhunga labafundi',
+      'Event of the Month': 'Umnyhadala wenyanga',
+      'Lecturer of the Year': 'Utitshala wonyaka',
+      'Welcome to the chat! (simulated)': 'Wamkelekile kwincoko! (umzekelo)',
+      'I just voted — go team!': 'Ndivotele nje — phambili iqela!'
+    }
+  };
+
+  const langs = ['en', 'af', 'xh'];
+  let currentLang = localStorage.getItem('su_language') || 'en';
+  updateLanguage(currentLang);
+
+  function cycleLanguage() {
+    const idx = langs.indexOf(currentLang);
+    currentLang = langs[(idx + 1) % langs.length];
+    updateLanguage(currentLang);
+    localStorage.setItem('su_language', currentLang);
+  }
+
+  langBtn.addEventListener('click', cycleLanguage);
+
+  function updateLanguage(lang) {
+    langBtn.textContent = lang.toUpperCase();
+
+    if (lang === 'en') {
+      // restore original text (reload or reverse translation)
+      document.querySelectorAll('[data-original-text]').forEach(el => {
+        el.textContent = el.getAttribute('data-original-text');
+      });
+      return;
+    }
+
+    // translate elements that have matching text content
+    for (const [enText, translated] of Object.entries(translations[lang])) {
+      document.querySelectorAll('*').forEach(el => {
+        const txt = el.textContent.trim();
+        if (txt === enText) {
+          if (!el.hasAttribute('data-original-text')) {
+            el.setAttribute('data-original-text', txt);
+          }
+          el.textContent = translated;
+        }
+      });
+    }
+  }
+})();
+</script>
+
+  
+
+ <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+</body>
+ </html>

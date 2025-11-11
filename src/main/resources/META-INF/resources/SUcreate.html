@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SU Vote">
+    <title>SU Vote | Poll Creation</title>
+    <link rel="stylesheet" href="/CSS/su.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <h1>SU Vote</h1>
+            </div>
+            <nav class="main-navigation">
+    <ul>
+        <li><a href="/home">Home</a></li>
+        <li><a href="/home/login">User</a></li> 
+        <li><a href="/home/dashboard">Polls</a></li>
+        <li><a href="/home/settings">Settings</a></li> 
+        <li><a href="/home/contact-us">Contact Us</a></li>
+    </ul>
+</nav>
+</div>
+    </header>
+
+   <main>
+  <section class="page-header">
+    <div class="container">
+      <h2>Create Poll</h2>
+      <p>Fill in the details below to set up a new poll. Once saved, choose if it’s public or private.</p>
+    </div>
+  </section>
+
+  <section class="contact-content">
+    <div class="container">
+      <div class="booking-container">
+        <h2>New Poll Form</h2>
+        <form id="pollForm" class="booking-form">
+          <div class="form-group">
+            <label for="pollTitle">Poll Title</label>
+            <input type="text" id="pollTitle" required>
+          </div>
+          <div class="form-group">
+            <label for="pollDescription">Poll Description</label>
+            <textarea id="pollDescription" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="pollDate">End Date</label>
+            <input type="date" id="pollDate" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Create Poll</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal for Public/Private -->
+  <div class="modal" id="shareModal">
+    <div class="modal-content">
+      <span class="modal-close-btn" id="closeModal">&times;</span>
+      <h3>Poll Visibility</h3>
+      <p>Would you like this poll to be public or private?</p>
+      <button class="btn btn-primary" id="makePublic">Public</button>
+      <button class="btn btn-secondary" id="makePrivate">Private</button>
+      <div id="shareLink" class="form-notice" style="margin-top:15px;"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('pollForm');
+    const modal = document.getElementById('shareModal');
+    const closeBtn = document.getElementById('closeModal');
+    const shareLink = document.getElementById('shareLink');
+    const makePublic = document.getElementById('makePublic');
+    const makePrivate = document.getElementById('makePrivate');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      modal.style.display = 'flex';
+    });
+
+    closeBtn.onclick = () => modal.style.display = 'none';
+
+    makePublic.onclick = () => {
+      const link = `https://su-vote.local/public/${Date.now()}`;
+      shareLink.innerHTML = `🔗 Public link generated: <a href="#">${link}</a>`;
+    };
+    makePrivate.onclick = () => {
+      const link = `https://su-vote.local/private/${Date.now()}`;
+      shareLink.innerHTML = `🔒 Private link generated: <a href="#">${link}</a>`;
+    };
+  </script>
+</main>
+
+
+     <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>SU Vote</h2>
+                    <p></p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                      <li><a href="SUindex.html">Home</a></li>
+                      <li><a href="SUlogin.html">User</a></li> 
+                      <li><a href="SUdashboard.html">Polls</a></li>
+                      <li><a href="SUprofilesettings.html">Settings</a></li> 
+                      <li><a href="SUabout.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p>Hammanshand Rd, Stellenbosch Central, Stellenbosch, 7599</p>
+                    <p>Phone: 0218084367</p>
+                    <p>Email: ruanr@sun.ac.za</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 SU. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+<!-- Dark Mode Toggle Script -->
+<script>
+(function() {
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'darkModeToggle';
+  toggleBtn.title = 'Toggle dark mode';
+  toggleBtn.textContent = '🌙';
+  document.body.appendChild(toggleBtn);
+
+  // Load user preference
+  const isDark = localStorage.getItem('su_dark_mode') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-mode');
+    toggleBtn.textContent = '☀️';
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const darkActive = document.body.classList.contains('dark-mode');
+    localStorage.setItem('su_dark_mode', darkActive);
+    toggleBtn.textContent = darkActive ? '☀️' : '🌙';
+  });
+})();
+</script>
+
+<!-- Language Toggle Script -->
+<script>
+(function() {
+  const langBtn = document.createElement('button');
+  langBtn.id = 'langToggle';
+  langBtn.title = 'Change language';
+  langBtn.textContent = 'EN';
+  document.body.appendChild(langBtn);
+
+  const translations = {
+    'af': {
+      'Vote For You, You, and You': 'Stem vir jouself, jouself, en jouself',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Kies jou gunsteling gebeurtenis — elke stem help om die wenner te bepaal.',
+      'Cast your vote': 'Stem nou',
+      'Student Council President': 'Studenteraadspresident',
+      'Event of the Month': 'Geleentheid van die maand',
+      'Lecturer of the Year': 'Dosent van die jaar',
+      'Welcome to the chat! (simulated)': 'Welkom by die klets! (gesimuleer)',
+      'I just voted — go team!': 'Ek het pas gestem — gaan span!'
+    },
+    'xh': {
+      'Vote For You, You, and You': 'Votela Wena, Wena, noWena',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Khetha umsitho owuthandayo — ivoti ngalinye linceda ekugqibeleni ophumeleleyo.',
+      'Cast your vote': 'Votela ngoku',
+      'Student Council President': 'UMongameli weBhunga labafundi',
+      'Event of the Month': 'Umnyhadala wenyanga',
+      'Lecturer of the Year': 'Utitshala wonyaka',
+      'Welcome to the chat! (simulated)': 'Wamkelekile kwincoko! (umzekelo)',
+      'I just voted — go team!': 'Ndivotele nje — phambili iqela!'
+    }
+  };
+
+  const langs = ['en', 'af', 'xh'];
+  let currentLang = localStorage.getItem('su_language') || 'en';
+  updateLanguage(currentLang);
+
+  function cycleLanguage() {
+    const idx = langs.indexOf(currentLang);
+    currentLang = langs[(idx + 1) % langs.length];
+    updateLanguage(currentLang);
+    localStorage.setItem('su_language', currentLang);
+  }
+
+  langBtn.addEventListener('click', cycleLanguage);
+
+  function updateLanguage(lang) {
+    langBtn.textContent = lang.toUpperCase();
+
+    if (lang === 'en') {
+      // restore original text (reload or reverse translation)
+      document.querySelectorAll('[data-original-text]').forEach(el => {
+        el.textContent = el.getAttribute('data-original-text');
+      });
+      return;
+    }
+
+    // translate elements that have matching text content
+    for (const [enText, translated] of Object.entries(translations[lang])) {
+      document.querySelectorAll('*').forEach(el => {
+        const txt = el.textContent.trim();
+        if (txt === enText) {
+          if (!el.hasAttribute('data-original-text')) {
+            el.setAttribute('data-original-text', txt);
+          }
+          el.textContent = translated;
+        }
+      });
+    }
+  }
+})();
+</script>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

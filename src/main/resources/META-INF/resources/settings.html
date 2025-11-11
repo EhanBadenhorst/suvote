@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SU Vote">
+    <title>SU Vote | Profile Settings</title>
+    <link rel="stylesheet" href="/CSS/su.css">
+</head>
+<body>
+   <main>
+  <section class="page-header">
+    <div class="container">
+      <h2>Profile Settings</h2>
+      <p>Update your personal details and account preferences below.</p>
+    </div>
+  </section>
+
+  <section class="contact-content">
+    <div class="container">
+      <div class="contact-form-container">
+        <h2>Account Information</h2>
+        <form class="contact-form">
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="example@email.com">
+          </div>
+          <div class="form-group">
+            <label for="password">New Password</label>
+            <input type="password" id="password" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label for="notifications">Notifications</label>
+            <select id="notifications">
+              <option>Enabled</option>
+              <option>Disabled</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+<!-- Dark Mode Toggle Script -->
+<script>
+(function() {
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'darkModeToggle';
+  toggleBtn.title = 'Toggle dark mode';
+  toggleBtn.textContent = '🌙';
+  document.body.appendChild(toggleBtn);
+
+  // Load user preference
+  const isDark = localStorage.getItem('su_dark_mode') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-mode');
+    toggleBtn.textContent = '☀️';
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const darkActive = document.body.classList.contains('dark-mode');
+    localStorage.setItem('su_dark_mode', darkActive);
+    toggleBtn.textContent = darkActive ? '☀️' : '🌙';
+  });
+})();
+</script>
+
+<!-- Language Toggle Script -->
+<script>
+(function() {
+  const langBtn = document.createElement('button');
+  langBtn.id = 'langToggle';
+  langBtn.title = 'Change language';
+  langBtn.textContent = 'EN';
+  document.body.appendChild(langBtn);
+
+  const translations = {
+    'af': {
+      'Vote For You, You, and You': 'Stem vir jouself, jouself, en jouself',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Kies jou gunsteling gebeurtenis — elke stem help om die wenner te bepaal.',
+      'Cast your vote': 'Stem nou',
+      'Student Council President': 'Studenteraadspresident',
+      'Event of the Month': 'Geleentheid van die maand',
+      'Lecturer of the Year': 'Dosent van die jaar',
+      'Welcome to the chat! (simulated)': 'Welkom by die klets! (gesimuleer)',
+      'I just voted — go team!': 'Ek het pas gestem — gaan span!'
+    },
+    'xh': {
+      'Vote For You, You, and You': 'Votela Wena, Wena, noWena',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Khetha umsitho owuthandayo — ivoti ngalinye linceda ekugqibeleni ophumeleleyo.',
+      'Cast your vote': 'Votela ngoku',
+      'Student Council President': 'UMongameli weBhunga labafundi',
+      'Event of the Month': 'Umnyhadala wenyanga',
+      'Lecturer of the Year': 'Utitshala wonyaka',
+      'Welcome to the chat! (simulated)': 'Wamkelekile kwincoko! (umzekelo)',
+      'I just voted — go team!': 'Ndivotele nje — phambili iqela!'
+    }
+  };
+
+  const langs = ['en', 'af', 'xh'];
+  let currentLang = localStorage.getItem('su_language') || 'en';
+  updateLanguage(currentLang);
+
+  function cycleLanguage() {
+    const idx = langs.indexOf(currentLang);
+    currentLang = langs[(idx + 1) % langs.length];
+    updateLanguage(currentLang);
+    localStorage.setItem('su_language', currentLang);
+  }
+
+  langBtn.addEventListener('click', cycleLanguage);
+
+  function updateLanguage(lang) {
+    langBtn.textContent = lang.toUpperCase();
+
+    if (lang === 'en') {
+      // restore original text (reload or reverse translation)
+      document.querySelectorAll('[data-original-text]').forEach(el => {
+        el.textContent = el.getAttribute('data-original-text');
+      });
+      return;
+    }
+
+    // translate elements that have matching text content
+    for (const [enText, translated] of Object.entries(translations[lang])) {
+      document.querySelectorAll('*').forEach(el => {
+        const txt = el.textContent.trim();
+        if (txt === enText) {
+          if (!el.hasAttribute('data-original-text')) {
+            el.setAttribute('data-original-text', txt);
+          }
+          el.textContent = translated;
+        }
+      });
+    }
+  }
+})();
+</script>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

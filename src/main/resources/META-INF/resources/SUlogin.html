@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SU Vote">
+    <title>SU Vote | Login</title>
+    <link rel="stylesheet" href="/CSS/su.css">
+    <style>
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <h1>SU Vote</h1>
+            </div>
+            <nav class="main-navigation">
+                <ul>
+                    
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="login-page-content">
+        <div class="container contact-content">
+            <div class="contact-layout">
+                <div class="contact-form-container">
+                    <h2>Login to Your Account</h2>
+                    
+                    <div id="errorMessage" class="error-message"></div>
+                    <div id="successMessage" class="success-message"></div>
+                    
+                    <form id="loginForm" class="contact-form">
+                        <div class="form-group">
+                            <label for="studentNo">Student Number</label>
+                            <input type="text" id="studentNo" name="studentNo" required placeholder="Enter your student number">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required placeholder="Enter your password">
+                        </div>
+                        <div class="form-submit">
+                            <button type="submit" class="btn btn-primary" id="loginBtn">Login</button>
+                        </div>
+                        
+                    </form>
+                </div>
+                <div class="contact-info">
+                    <h2>New to SU Vote?</h2>
+                    <p>Unlock exclusive features by logging in or creating a new account.</p>
+                    <p>By logging in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>SU Vote</h2>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p>Hammanshand Rd, Stellenbosch Central, Stellenbosch, 7599</p>
+                    <p>Phone: 0218084367</p>
+                    <p>Email: ruanr@sun.ac.za</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 SU. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const studentNo = document.getElementById('studentNo').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Hide previous messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Basic validation
+            if (!studentNo || !password) {
+                showError('Please enter both student number and password');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.textContent = 'Logging in...';
+            loginBtn.disabled = true;
+            loginBtn.classList.add('loading');
+            
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: studentNo,  // Changed to match Java backend
+                        password: password
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                const data = await response.json();
+                console.log('Login response:', data);
+                
+                if (data.success) {
+                    // Login successful
+                    showSuccess('Login successful! Redirecting...');
+                    
+                    // Store user data in localStorage
+                    localStorage.setItem('student', JSON.stringify({
+                        studentNo: data.studentNo,
+                        fullName: data.fullName
+                    }));
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    // Redirect to dashboard after 1 second
+                    setTimeout(() => {
+                        window.location.href = '/home/dashboard';
+                    }, 1000);
+                    
+                } else {
+                    // Login failed
+                    showError(data.message || 'Invalid student number or password');
+                    resetLoginButton();
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Network error. Please try again. Make sure the server is running on port 8080.');
+                resetLoginButton();
+            }
+        });
+        
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+        }
+        
+        function resetLoginButton() {
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.textContent = 'Login';
+            loginBtn.disabled = false;
+            loginBtn.classList.remove('loading');
+        }
+        
+        // Check if already logged in
+        window.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                window.location.href = '/home/dashboard';
+            }
+            
+            // Debug: Test if endpoints are available
+            console.log('Testing endpoints...');
+            fetch('/auth/login', { method: 'OPTIONS' })
+                .then(() => console.log('✅ Auth endpoint available'))
+                .catch(() => console.log('❌ Auth endpoint not available'));
+                
+            fetch('/home/login', { method: 'GET' })
+                .then(() => console.log('✅ Home endpoint available'))
+                .catch(() => console.log('❌ Home endpoint not available'));
+        });
+    </script>
+</body>
+</html>

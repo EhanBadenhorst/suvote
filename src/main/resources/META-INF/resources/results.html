@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SU Vote | Results</title>
+  <link rel="stylesheet" href="/CSS/su.css">
+  
+</head>
+<body>
+  <main>
+    <section class="intro">
+      <div class="container">
+        <h2>Live results & chat (prototype)</h2>
+        <p>This page reads votes from your browser and displays them in a bar chart that updates automatically. The chat is simulated for demo purposes.</p>
+
+        <div class="results-wrap">
+          <!-- Chart area -->
+          <div class="chart-card">
+            <div class="meta-line">
+              <div><strong>Current Poll Results</strong></div>
+              <div class="small-muted" id="totalVotes">Total votes: 0</div>
+            </div>
+            <canvas id="resultsChart" height="220"></canvas>
+            <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+              <button class="btn btn-secondary" id="resetBtn">Reset votes (dev)</button>
+              <div style="flex:1"></div>
+              <a class="btn btn-primary" href="SUvote.html">Cast a vote</a>
+            </div>
+          </div>
+
+          <!-- Chat area -->
+          <aside class="chat-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div><strong>Voter Chat</strong></div>
+              <div class="small-muted">Prototype • Local</div>
+            </div>
+
+            <div class="chat-log" id="chatLog" aria-live="polite"></div>
+
+            <div class="chat-input">
+              <input id="chatInput" placeholder="Write a message..." aria-label="Chat message" />
+              <button class="btn btn-primary" id="sendChatBtn">Send</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+  // SAME options array as the vote page — keep in sync if you change
+  const OPTIONS = [
+    { id: 'president', title: 'Student Council President' },
+    { id: 'event', title: 'Event of the Month' },
+    { id: 'lecturer', title: 'Lecturer of the Year' }
+  ];
+
+  // Initialize votes if missing (same helper used on vote page)
+  function initVotes() {
+    try {
+      const raw = localStorage.getItem('su_votes');
+      if (!raw) {
+        const init = {};
+        OPTIONS.forEach(o => init[o.id] = 0);
+        localStorage.setItem('su_votes', JSON.stringify(init));
+        return init;
+      } else {
+        const parsed = JSON.parse(raw);
+        OPTIONS.forEach(o => { if (!(o.id in parsed)) parsed[o.id] = 0; });
+        localStorage.setItem('su_votes', JSON.stringify(parsed));
+        return parsed;
+      }
+    } catch(e) {
+      const init = {};
+      OPTIONS.forEach(o => init[o.id] = 0);
+      localStorage.setItem('su_votes', JSON.stringify(init));
+      return init;
+    }
+  }
+
+  // Read votes from localStorage
+  function readVotes() {
+    const raw = localStorage.getItem('su_votes');
+    if (!raw) return initVotes();
+    try { return JSON.parse(raw); } catch(e) { return initVotes(); }
+  }
+
+  // Create Chart.js bar chart
+  const ctx = document.getElementById('resultsChart').getContext('2d');
+  const labels = OPTIONS.map(o => o.title);
+  const initialVotes = OPTIONS.map(o => readVotes()[o.id] || 0);
+
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Votes',
+        data: initialVotes,
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 600 },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { precision:0 }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  // update chart with fresh data
+  function updateChartFromStorage() {
+    const votes = readVotes();
+    const data = OPTIONS.map(o => votes[o.id] || 0);
+    const total = data.reduce((a,b)=>a+b, 0);
+    chart.data.datasets[0].data = data;
+    // make chart visually update
+    chart.update();
+    document.getElementById('totalVotes').textContent = `Total votes: ${total}`;
+  }
+
+  // poll localStorage every second for updates (simulates live)
+  setInterval(updateChartFromStorage, 1000);
+  window.addEventListener('storage', (e) => { if (e.key === 'su_votes') updateChartFromStorage(); });
+
+  // Reset button (development convenience)
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    const cleared = {};
+    OPTIONS.forEach(o => cleared[o.id] = 0);
+    localStorage.setItem('su_votes', JSON.stringify(cleared));
+    window.dispatchEvent(new Event('votes-updated'));
+    updateChartFromStorage();
+    alert('Votes reset (local prototype).');
+  });
+
+  // --- Chat simulation ---
+  const chatLog = document.getElementById('chatLog');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendChatBtn');
+
+  // small set of simulated users/messages for demo
+  const BOT_USERS = [
+    { name: 'Sam', avatar: 'S' },
+    { name: 'Lindi', avatar: 'L' },
+    { name: 'Ayesha', avatar: 'A' },
+    { name: 'Jono', avatar: 'J' }
+  ];
+  const BOT_MESSAGES = [
+    "I voted, ps excited for the winner!",
+    "Car spinning looks wild 🔥",
+    "Art Day seems too chill for a Friday.",
+    "Is voting anonymous here?",
+    "Let's hope our FAV lecturer wins",
+    "This prototype is slick!"
+  ];
+
+  function appendChat({ who='bot', text='hello', me=false }) {
+    const row = document.createElement('div');
+    row.className = 'chat-row' + (me ? ' chat-me' : '');
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = who.charAt(0) || '?';
+    const msg = document.createElement('div');
+    msg.className = 'msg' + (me ? ' me' : '');
+    msg.textContent = text;
+    if (me) {
+      // me on right side
+      row.appendChild(msg);
+      row.appendChild(avatar);
+    } else {
+      row.appendChild(avatar);
+      row.appendChild(msg);
+    }
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  // seed chat with a few messages
+  appendChat({ who: 'Sam', text: 'Welcome to the chat! (simulated)', me:false });
+  appendChat({ who: 'Ayesha', text: 'I just voted!', me:false });
+
+  // send message UI handler
+  sendBtn.addEventListener('click', () => {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    appendChat({ who: 'You', text, me: true });
+    chatInput.value = '';
+    // small local echo delay for realism
+    setTimeout(() => appendChat({ who: 'Bot', text: "Nice one!", me:false }), 900);
+  });
+  chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendBtn.click(); });
+
+  // simulated incoming messages at random intervals
+  function simulateIncoming() {
+    const user = BOT_USERS[Math.floor(Math.random()*BOT_USERS.length)];
+    const text = BOT_MESSAGES[Math.floor(Math.random()*BOT_MESSAGES.length)];
+    appendChat({ who: user.name, text, me:false });
+    // next arrival 6-14s randomly
+    const next = 6000 + Math.random()*8000;
+    setTimeout(simulateIncoming, next);
+  }
+  // start after a short delay
+  setTimeout(simulateIncoming, 5000);
+
+  // make sure chart is in sync immediately
+  updateChartFromStorage();
+  </script>
+
+<!-- Dark Mode Toggle Script -->
+<script>
+(function() {
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'darkModeToggle';
+  toggleBtn.title = 'Toggle dark mode';
+  toggleBtn.textContent = '🌙';
+  document.body.appendChild(toggleBtn);
+
+  // Load user preference
+  const isDark = localStorage.getItem('su_dark_mode') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-mode');
+    toggleBtn.textContent = '☀️';
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const darkActive = document.body.classList.contains('dark-mode');
+    localStorage.setItem('su_dark_mode', darkActive);
+    toggleBtn.textContent = darkActive ? '☀️' : '🌙';
+  });
+})();
+</script>
+
+<!-- Language Toggle Script -->
+<script>
+(function() {
+  const langBtn = document.createElement('button');
+  langBtn.id = 'langToggle';
+  langBtn.title = 'Change language';
+  langBtn.textContent = 'EN';
+  document.body.appendChild(langBtn);
+
+  const translations = {
+    'af': {
+      'Vote For You, You, and You': 'Stem vir jouself, jouself, en jouself',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Kies jou gunsteling gebeurtenis — elke stem help om die wenner te bepaal.',
+      'Cast your vote': 'Stem nou',
+      'Student Council President': 'Studenteraadspresident',
+      'Event of the Month': 'Geleentheid van die maand',
+      'Lecturer of the Year': 'Dosent van die jaar',
+      'Welcome to the chat! (simulated)': 'Welkom by die klets! (gesimuleer)',
+      'I just voted — go team!': 'Ek het pas gestem — gaan span!'
+    },
+    'xh': {
+      'Vote For You, You, and You': 'Votela Wena, Wena, noWena',
+      'Choose your favourite event — every vote helps decide the winner.':
+        'Khetha umsitho owuthandayo — ivoti ngalinye linceda ekugqibeleni ophumeleleyo.',
+      'Cast your vote': 'Votela ngoku',
+      'Student Council President': 'UMongameli weBhunga labafundi',
+      'Event of the Month': 'Umnyhadala wenyanga',
+      'Lecturer of the Year': 'Utitshala wonyaka',
+      'Welcome to the chat! (simulated)': 'Wamkelekile kwincoko! (umzekelo)',
+      'I just voted — go team!': 'Ndivotele nje — phambili iqela!'
+    }
+  };
+
+  const langs = ['en', 'af', 'xh'];
+  let currentLang = localStorage.getItem('su_language') || 'en';
+  updateLanguage(currentLang);
+
+  function cycleLanguage() {
+    const idx = langs.indexOf(currentLang);
+    currentLang = langs[(idx + 1) % langs.length];
+    updateLanguage(currentLang);
+    localStorage.setItem('su_language', currentLang);
+  }
+
+  langBtn.addEventListener('click', cycleLanguage);
+
+  function updateLanguage(lang) {
+    langBtn.textContent = lang.toUpperCase();
+
+    if (lang === 'en') {
+      // restore original text (reload or reverse translation)
+      document.querySelectorAll('[data-original-text]').forEach(el => {
+        el.textContent = el.getAttribute('data-original-text');
+      });
+      return;
+    }
+
+    // translate elements that have matching text content
+    for (const [enText, translated] of Object.entries(translations[lang])) {
+      document.querySelectorAll('*').forEach(el => {
+        const txt = el.textContent.trim();
+        if (txt === enText) {
+          if (!el.hasAttribute('data-original-text')) {
+            el.setAttribute('data-original-text', txt);
+          }
+          el.textContent = translated;
+        }
+      });
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
